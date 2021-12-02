@@ -18,7 +18,7 @@ BOT_KEY = os.getenv('BOT_KEY', '')
 CHAT_ID = os.getenv('CHAT_ID', '')
 HOST = os.getenv('HOST', '')
 CRF = os.getenv('CRF', '16')
-H265_TRANSCODE = os.getenv('H265_TRANSCODE', 'true')
+H265_TRANSCODE = os.getenv('H265_TRANSCODE', 'false')
 H265_MB_H = os.getenv('H265_MB_H', '1000')
 DEBUG_ON = os.getenv("DEBUG_ON", 'false')
 
@@ -33,7 +33,7 @@ def transcode(file, pbar, desc, frames):
 	previous_frame = 0
 	new_size = 0
 
-	cmd = 'ffmpeg -y -i "{}" -map 0 -c copy -c:v libx265 -preset ultrafast -x265-params crf={} -c:a libfdk_aac -strict -2 -b:a 256k "{}.new.mkv"'.format(file, CRF, file)
+	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v -map 0:a -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
 
 	if DEBUG_ON == 'true':
 		print("\nStarting ffmpeg: {}".format(cmd))
@@ -270,7 +270,7 @@ def is_transcodable(file, data):
 
 	transcode_h265 = False
 
-	if found_h265 and H265_MB_H != '':
+	if found_h265 and H265_TRANSCODE == 'true' and H265_MB_H != '':
 		size = os.path.getsize(file)
 		duration = get_duration(data)
 		if duration > 0:
