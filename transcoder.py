@@ -256,7 +256,7 @@ def has_accessors(file):
 
 
 def is_transcodable(file, data):
-	if len(data['stream']) == 0:
+	if len(data['stream']) == 0 or file.find('265') >= 0:
 		return False
 
 	found_h264 = False
