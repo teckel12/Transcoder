@@ -135,7 +135,7 @@ def transcode(file, pbar, desc, frames):
 
 		if original < converted or not success:
 			os.remove(file + '.new.mkv')
-			### Create a process if the converted file is larger than the original
+			os.rename(file, file.rsplit('.', 1)[0] + '-SKIP.' + file.rsplit('.', 1)[1])
 		elif converted > 1000000 and success:
 			### Move the source file instead of deleting it
 			os.remove(file)
@@ -256,18 +256,13 @@ def has_accessors(file):
 
 
 def is_transcodable(file, data):
-	if len(data['stream']) == 0 or file.find('265') >= 0:
+	if len(data['stream']) == 0 or file.find('265') >= 0 or file.find('-SKIP.') >= 0:
 		return False
 
-	found_h264 = False
 	found_h265 = False
 	for i in data['stream']:
-		if data['stream'][i]['codec_name'] == 'h264':
-			found_h264 = True
-			break
-		elif data['stream'][i]['codec_name'] == 'h265' or data['stream'][i]['codec_name'] == 'hevc':
+		if data['stream'][i]['codec_name'] == 'h265' or data['stream'][i]['codec_name'] == 'hevc':
 			found_h265 = True
-			break
 
 	transcode_h265 = False
 
@@ -279,7 +274,7 @@ def is_transcodable(file, data):
 			if mb_h > int(H265_MB_H):
 				transcode_h265 = True
 
-	if not found_h264 and not transcode_h265:
+	if found_h265 and not transcode_h265:
 		return False
 
 	if file.endswith("partial~"):
