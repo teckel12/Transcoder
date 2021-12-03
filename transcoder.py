@@ -133,9 +133,13 @@ def transcode(file, pbar, desc, frames):
 		if os.path.exists(file + '.new.mkv'):
 			converted = os.path.getsize(file + '.new.mkv')
 
-		if original < converted or not success:
-			os.remove(file + '.new.mkv')
+		if not success:
+			if os.path.exists(file + '.new.mkv'):
+				os.remove(file + '.new.mkv')
+		elif original < converted:
 			os.rename(file, file.rsplit('.', 1)[0] + '-SKIP.' + file.rsplit('.', 1)[1])
+			if os.path.exists(file + '.new.mkv'):
+				os.remove(file + '.new.mkv')
 		elif converted > 1000000 and success:
 			### Move the source file instead of deleting it
 			os.remove(file)
@@ -151,8 +155,9 @@ def transcode(file, pbar, desc, frames):
 	print("Stopping...")
 
 	update_message(prepare_stopping_message(os.path.basename(file), original, new_size, (previous_frame / frames) * 100))
-
-	os.remove(file + '.new.mkv')
+	
+	if os.path.exists(file + '.new.mkv'):
+		os.remove(file + '.new.mkv')
 
 	return -1, -1, finished
 
