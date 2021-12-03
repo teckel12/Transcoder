@@ -33,8 +33,9 @@ def transcode(file, pbar, desc, frames):
 	previous_frame = 0
 	new_size = 0
 
-	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v -map 0:a -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
-
+	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:a:0? -map 0:v:0 -c:a copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
+	# cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v -map 0:a -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
+	
 	if DEBUG_ON == 'true':
 		print("\nStarting ffmpeg: {}".format(cmd))
 
@@ -133,25 +134,32 @@ def transcode(file, pbar, desc, frames):
 		if os.path.exists(file + '.new.mkv'):
 			converted = os.path.getsize(file + '.new.mkv')
 
-		directory = os.path.dirname(file)
-		with open(directory + "/." + os.path.basename(file + ".processed"), 'w') as f:
-			if original < converted or not success:
-				f.write(str(original))
+		if not success:
+			if os.path.exists(file + '.new.mkv'):
 				os.remove(file + '.new.mkv')
-			elif converted > 1000000 and success:
-				f.write(str(converted))
-				os.remove(file)
-				os.rename(file + '.new.mkv', file)
-			else:
-				finished = False
+		elif original < converted:
+			os.rename(file, file.rsplit('.', 1)[0] + '-SKIP.' + file.rsplit('.', 1)[1])
+			if os.path.exists(file + '.new.mkv'):
+				os.remove(file + '.new.mkv')
+		elif converted > 1000000 and success:
+			basename = os.path.basename(file)
+			basename = basename.rsplit('.', 1)[0] + '-CVT265.mkv'
+			basename = basename.replace('264', '')
+			newfile = os.path.dirname(file) + '/' + basename
+			os.rename(file + '.new.mkv', newfile)
+			os.chmod(newfile, 0o777)
+			os.rename(file, ROOT_PATH + '/.backup/' + os.path.basename(file))
+		else:
+			finished = False
 
 		return original, converted, finished
 
 	print("Stopping...")
 
 	update_message(prepare_stopping_message(os.path.basename(file), original, new_size, (previous_frame / frames) * 100))
-
-	os.remove(file + '.new.mkv')
+	
+	if os.path.exists(file + '.new.mkv'):
+		os.remove(file + '.new.mkv')
 
 	return -1, -1, finished
 
@@ -255,18 +263,13 @@ def has_accessors(file):
 
 
 def is_transcodable(file, data):
-	if len(data['stream']) == 0:
+	if len(data['stream']) == 0 or file.find('265') >= 0 or file.find('-SKIP.') >= 0:
 		return False
 
-	found_h264 = False
 	found_h265 = False
 	for i in data['stream']:
-		if data['stream'][i]['codec_name'] == 'h264':
-			found_h264 = True
-			break
-		elif data['stream'][i]['codec_name'] == 'h265' or data['stream'][i]['codec_name'] == 'hevc':
+		if data['stream'][i]['codec_name'] == 'h265' or data['stream'][i]['codec_name'] == 'hevc':
 			found_h265 = True
-			break
 
 	transcode_h265 = False
 
@@ -278,7 +281,7 @@ def is_transcodable(file, data):
 			if mb_h > int(H265_MB_H):
 				transcode_h265 = True
 
-	if not found_h264 and not transcode_h265:
+	if found_h265 and not transcode_h265:
 		return False
 
 	if file.endswith("partial~"):

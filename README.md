@@ -30,7 +30,7 @@ You can ignore files using `.transcodeignore`, which will make it not transcode 
 
 ## Re-Transcoding H265 -> H265
 
-By default, the option to re-transcode H265 -> H265 is enabled. You can turn it off by setting environment variable `H265_TRANSCODE` to False
+By default, the option to re-transcode H265 -> H265 is disabled. You can turn it on by setting environment variable `H265_TRANSCODE` to `true`
 
 The other variable `H265_MB_H` defines how many MB/h is your target. If a file is below that target, it will not attempt to re-transcode the file.
 
@@ -46,5 +46,5 @@ It uses the formula `size / duration` instead of the reported bit rate by ffmpeg
 | CHAT_ID        | The Telegram chat ID to report to                                      |         |
 | HOST           | The Host to specify in Telegram messages                               |         |
 | CRF            | The Constant Rate Factor quality setting. Lower number, better quality | 16      |
-| H265_TRANSCODE | Whether to re-transcode H265 content                                   | True    |
+| H265_TRANSCODE | Whether to re-transcode H265 content                                   | false   |
 | H265_MB_H      | Minimum MB/h to attempt to re-transcode H265 content                   | 1000    |
