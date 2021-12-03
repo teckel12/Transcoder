@@ -33,8 +33,9 @@ def transcode(file, pbar, desc, frames):
 	previous_frame = 0
 	new_size = 0
 
-	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v -map 0:a -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
-
+	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:a:0? -map 0:v:0 -c:a copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
+	# cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v -map 0:a -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
+	
 	if DEBUG_ON == 'true':
 		print("\nStarting ffmpeg: {}".format(cmd))
 
