@@ -142,12 +142,13 @@ def transcode(file, pbar, desc, frames):
 			if os.path.exists(file + '.new.mkv'):
 				os.remove(file + '.new.mkv')
 		elif converted > 1000000 and success:
-			### Move the source file instead of deleting it
-			os.remove(file)
-			### Success, this renames the file the way I want
-			### Figure out how to remove the `264` in the file name
-			os.rename(file + '.new.mkv', file.rsplit('.', 1)[0] + '-CVT265.mkv')
-			os.chmod(file.rsplit('.', 1)[0] + '-CVT265.mkv', 0o777)
+			basename = os.path.basename(file)
+			basename = basename.rsplit('.', 1)[0] + '-CVT265.mkv'
+			basename = basename.replace('264', '')
+			newfile = os.path.dirname(file) + '/' + basename
+			os.rename(file + '.new.mkv', newfile)
+			os.chmod(newfile, 0o777)
+			os.rename(file, ROOT_PATH + '/.backup/' + os.path.basename(file))
 		else:
 			finished = False
 
