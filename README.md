@@ -42,6 +42,7 @@ It uses the formula `size / duration` instead of the reported bit rate by ffmpeg
 | Variable       | Description                                                            | Default |
 |----------------|------------------------------------------------------------------------|---------|
 | ROOT_PATH      | The path of media to transcode (inside the container)                  | /media  |
+| BACKUP_DIR     | The directory to copy original files for backup (inside ROOT_PATH)     | .backup |
 | BOT_KEY        | The Telegram bot key                                                   |         |
 | CHAT_ID        | The Telegram chat ID to report to                                      |         |
 | HOST           | The Host to specify in Telegram messages                               |         |
