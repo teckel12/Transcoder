@@ -14,6 +14,7 @@ import time
 
 
 ROOT_PATH = os.getenv('ROOT_PATH', '/media')
+BACKUP_DIR = os.getenv('BACKUP_DIR', '.backup')
 BOT_KEY = os.getenv('BOT_KEY', '')
 CHAT_ID = os.getenv('CHAT_ID', '')
 HOST = os.getenv('HOST', '')
@@ -33,8 +34,8 @@ def transcode(file, pbar, desc, frames):
 	previous_frame = 0
 	new_size = 0
 
-	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:a:0? -map 0:v:0 -c:a copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
-	# cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v -map 0:a -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
+	# cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:a:0? -map 0:v:0 -c:a copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
+	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v:0 -map 0:a? -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
 	
 	if DEBUG_ON == 'true':
 		print("\nStarting ffmpeg: {}".format(cmd))
@@ -148,7 +149,7 @@ def transcode(file, pbar, desc, frames):
 			newfile = os.path.dirname(file) + '/' + basename
 			os.rename(file + '.new.mkv', newfile)
 			os.chmod(newfile, 0o777)
-			os.rename(file, ROOT_PATH + '/.backup/' + os.path.basename(file))
+			os.rename(file, ROOT_PATH + '/' + BACKUP_DIR + '/' + os.path.basename(file))
 		else:
 			finished = False
 
