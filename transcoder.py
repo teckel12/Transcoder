@@ -145,6 +145,18 @@ def transcode(file, pbar, desc, frames):
 		elif converted > 1000000 and success:
 			basename = os.path.basename(file)
 			basename = basename.rsplit('.', 1)[0] + '-CVT265.mkv'
+			basename = basename.replace('.x264', '')
+			basename = basename.replace('.X264', '')
+			basename = basename.replace('.h.264', '')
+			basename = basename.replace('.H.264', '')
+			basename = basename.replace('.h264', '')
+			basename = basename.replace('.H264', '')
+			basename = basename.replace('x264', '')
+			basename = basename.replace('X264', '')
+			basename = basename.replace('h.264', '')
+			basename = basename.replace('H.264', '')
+			basename = basename.replace('h264', '')
+			basename = basename.replace('H264', '')
 			basename = basename.replace('264', '')
 			newfile = os.path.dirname(file) + '/' + basename
 			os.rename(file + '.new.mkv', newfile)
