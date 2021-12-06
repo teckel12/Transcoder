@@ -135,10 +135,7 @@ def transcode(file, pbar, desc, frames):
 		if os.path.exists(file + '.new.mkv'):
 			converted = os.path.getsize(file + '.new.mkv')
 
-		if not success:
-			if os.path.exists(file + '.new.mkv'):
-				os.remove(file + '.new.mkv')
-		elif original < converted:
+		if not success or converted > original:
 			os.rename(file, file.rsplit('.', 1)[0] + '-SKIP.' + file.rsplit('.', 1)[1])
 			if os.path.exists(file + '.new.mkv'):
 				os.remove(file + '.new.mkv')
