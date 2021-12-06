@@ -349,6 +349,7 @@ def search(path, name, depth=0, prefix='', last=True):
 
 	if os.path.isdir(path):
 		files = os.listdir(path)
+		files.sort()
 		length = len(files)
 
 		if ".transcodeignore" in files:
