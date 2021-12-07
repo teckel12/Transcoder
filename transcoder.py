@@ -273,6 +273,9 @@ def has_accessors(file):
 
 
 def is_transcodable(file, data):
+	# These encoders should *maybe* be skipped automatically as the compression isn't effective:
+	# CAFFEiNE
+	#
 	if len(data['stream']) == 0 or file.find('265') >= 0 or file.find('HEVC') >= 0 or file.find('-SKIP.') >= 0 or os.path.getsize(file) / 1048576 < 350:
 		return False
 
