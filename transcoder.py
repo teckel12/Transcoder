@@ -273,10 +273,7 @@ def has_accessors(file):
 
 
 def is_transcodable(file, data):
-	# These encoders should *maybe* be skipped automatically as the compression isn't effective:
-	# CAFFEiNE
-	#
-	if len(data['stream']) == 0 or file.find('265') >= 0 or file.find('HEVC') >= 0 or file.find('-SKIP.') >= 0 or os.path.getsize(file) / 1048576 < 350:
+	if len(data['stream']) == 0:
 		return False
 
 	found_h265 = False
@@ -363,43 +360,48 @@ def search(path, name, depth=0, prefix='', last=True):
 				else:
 					search(path + '/' + files[i], files[i], depth + 1, prefix + '  ', i + 1 == length)
 	else:
-		try:
-			data = get_data(path)
-		except:
-			data = None
-			traceback.print_exc(file=sys.stdout)
+		if path.find('265') >= 0 or path.find('HEVC') >= 0 or path.find('-SKIP.') >= 0 or path.find('CAFFEiNE') >= 0 or path.find('-ROBOTS.') >= 0 or path.find('-BAE.') >= 0:
+			print(name)
+		elif os.path.getsize(path) / 1048576 < 350:
+			print(name)
+		else:
+			try:
+				data = get_data(path)
+			except:
+				data = None
+				traceback.print_exc(file=sys.stdout)
 
-		if data is not None:
-			if is_transcodable(path, data):
-				print(name + '... ', end='')
+			if data is not None:
+				if is_transcodable(path, data):
+					print(name + '... ', end='')
 
-				result = process(path, desc + name, data)
+					result = process(path, desc + name, data)
 
-				if result[0] > 0:
-					diff = round((result[1] / result[0]) * 100, 2)
+					if result[0] > 0:
+						diff = round((result[1] / result[0]) * 100, 2)
 
-					oldsize = convert_size(result[0])
-					newsize = convert_size(result[1])
+						oldsize = convert_size(result[0])
+						newsize = convert_size(result[1])
 
-					if result[2]:
-						if result[1] > result[0]:
-							print('{} -> {} ({}%) (kept old)'.format(oldsize, newsize, diff))
-							update_message('*{}*\n*Size:* {} --> {} ({}%)\n*Status:* Kept old'.format(name, oldsize, newsize, diff))
+						if result[2]:
+							if result[1] > result[0]:
+								print('{} -> {} ({}%) (kept old)'.format(oldsize, newsize, diff))
+								update_message('*{}*\n*Size:* {} --> {} ({}%)\n*Status:* Kept old'.format(name, oldsize, newsize, diff))
+							else:
+								print('{} -> {} ({}%)'.format(oldsize, newsize, diff))
+								update_message('*{}*\n*Size:* {} --> {} ({}%)\n*Status:* Replaced with new'.format(name, oldsize, newsize, diff))
 						else:
-							print('{} -> {} ({}%)'.format(oldsize, newsize, diff))
-							update_message('*{}*\n*Size:* {} --> {} ({}%)\n*Status:* Replaced with new'.format(name, oldsize, newsize, diff))
-					else:
-						if result[1] > result[0]:
-							print('{} -> {} ({}%) (kept old)'.format(oldsize, newsize, diff))
-							update_message('*{}*\n*Size:* {} --> Gave up at {} ({}%)\n*Status:* Kept old'.format(name, oldsize, newsize, diff))
-						else:
-							print('{} -> {} ({}%) (kept old)'.format(oldsize, newsize, diff))
-							update_message('*{}*\n*Size:* {} --> Failed at {} ({}%)\n*Status:* Kept old'.format(name, oldsize, newsize, diff))
-				elif result[0] == 0:
-					print('failed')
+							if result[1] > result[0]:
+								print('{} -> {} ({}%) (kept old)'.format(oldsize, newsize, diff))
+								update_message('*{}*\n*Size:* {} --> Gave up at {} ({}%)\n*Status:* Kept old'.format(name, oldsize, newsize, diff))
+							else:
+								print('{} -> {} ({}%) (kept old)'.format(oldsize, newsize, diff))
+								update_message('*{}*\n*Size:* {} --> Failed at {} ({}%)\n*Status:* Kept old'.format(name, oldsize, newsize, diff))
+					elif result[0] == 0:
+						print('failed')
 
-			else:
-				print(name)
+				else:
+					print(name)
 
 
 def prepare_message(filename, original_size, current_size, percentage_complete):
