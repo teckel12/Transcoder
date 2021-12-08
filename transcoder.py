@@ -345,6 +345,10 @@ def search(path, name, depth=0, prefix='', last=True):
 		print(desc, end='')
 
 	if os.path.isdir(path):
+		if path.find('__thumb') >= 0:
+			print(name + ' [ignored]')
+			return
+
 		files = os.listdir(path)
 		files.sort()
 		length = len(files)
