@@ -90,7 +90,7 @@ def transcode(file, pbar, desc, frames):
 
 				if os.path.isfile(file + '.new.mkv'):
 					new_size = os.path.getsize(file + '.new.mkv')
-					if new_size > original:
+					if new_size > original * 0.9 or (previous_frame / frames > 0.03 and new_size / (previous_frame / frames) > original * 0.9):
 						thread.kill(9)
 						time.sleep(0.1)
 						if thread.isalive():
@@ -135,7 +135,7 @@ def transcode(file, pbar, desc, frames):
 		if os.path.exists(file + '.new.mkv'):
 			converted = os.path.getsize(file + '.new.mkv')
 
-		if not success or converted > original:
+		if not success or converted > original * 0.9:
 			os.rename(file, file.rsplit('.', 1)[0] + '-SKIP.' + file.rsplit('.', 1)[1])
 			if os.path.exists(file + '.new.mkv'):
 				os.remove(file + '.new.mkv')
@@ -360,9 +360,7 @@ def search(path, name, depth=0, prefix='', last=True):
 				else:
 					search(path + '/' + files[i], files[i], depth + 1, prefix + '  ', i + 1 == length)
 	else:
-		if path.find('265') >= 0 or path.find('HEVC') >= 0 or path.find('-SKIP.') >= 0 or path.find('CAFFEiNE') >= 0 or path.find('-ROBOTS.') >= 0 or path.find('-BAE.') >= 0:
-			print(name)
-		elif os.path.getsize(path) / 1048576 < 350:
+		if path.find('265') >= 0 or path.find('HEVC') >= 0 or path.find('-SKIP.') >= 0 or os.path.getsize(path) / 1048576 < 500:
 			print(name)
 		else:
 			try:
