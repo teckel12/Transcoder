@@ -36,7 +36,7 @@ def transcode(file, pbar, desc, frames):
 
 	# cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:a:0? -map 0:v:0 -c:a copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
 	cmd = 'ffmpeg -y -i "{}" -max_muxing_queue_size 9999 -map 0:v:0 -map 0:a? -map 0:s? -map 0:m:language:eng? -c:a copy -c:s copy -c:v libx265 -preset veryfast -x265-params crf={} "{}.new.mkv"'.format(file, CRF, file)
-	
+
 	if DEBUG_ON == 'true':
 		print("\nStarting ffmpeg: {}".format(cmd))
 
@@ -167,7 +167,7 @@ def transcode(file, pbar, desc, frames):
 	print("Stopping...")
 
 	update_message(prepare_stopping_message(os.path.basename(file), original, new_size, (previous_frame / frames) * 100))
-	
+
 	if os.path.exists(file + '.new.mkv'):
 		os.remove(file + '.new.mkv')
 
