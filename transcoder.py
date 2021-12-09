@@ -90,7 +90,7 @@ def transcode(file, pbar, desc, frames):
 
 				if os.path.isfile(file + '.new.mkv'):
 					new_size = os.path.getsize(file + '.new.mkv')
-					if new_size > original * 0.9 or (previous_frame / frames > 0.03 and new_size / (previous_frame / frames) > original * 0.9):
+					if new_size > original * 0.8 or (previous_frame / frames > 0.03 and new_size / (previous_frame / frames) > original * 0.8):
 						thread.kill(9)
 						time.sleep(0.1)
 						if thread.isalive():
@@ -135,7 +135,7 @@ def transcode(file, pbar, desc, frames):
 		if os.path.exists(file + '.new.mkv'):
 			converted = os.path.getsize(file + '.new.mkv')
 
-		if not success or converted > original * 0.9:
+		if not success or converted > original * 0.8:
 			os.rename(file, file.rsplit('.', 1)[0] + '-SKIP.' + file.rsplit('.', 1)[1])
 			if os.path.exists(file + '.new.mkv'):
 				os.remove(file + '.new.mkv')
