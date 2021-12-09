@@ -90,7 +90,7 @@ def transcode(file, pbar, desc, frames):
 
 				if os.path.isfile(file + '.new.mkv'):
 					new_size = os.path.getsize(file + '.new.mkv')
-					if new_size > original * 0.8 or (previous_frame / frames > 0.03 and new_size / (previous_frame / frames) > original * 0.8):
+					if new_size > original * 0.8 or (previous_frame / frames > 0.03 and new_size / (previous_frame / frames) > original * 0.825):
 						thread.kill(9)
 						time.sleep(0.1)
 						if thread.isalive():
