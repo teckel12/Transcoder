@@ -364,7 +364,7 @@ def search(path, name, depth=0, prefix='', last=True):
 				else:
 					search(path + '/' + files[i], files[i], depth + 1, prefix + '  ', i + 1 == length)
 	else:
-		if path.find('265') >= 0 or path.find('HEVC') >= 0 or path.find('-SKIP.') >= 0 or os.path.getsize(path) / 1048576 < 500:
+		if path.find('265') >= 0 or path.find('HEVC') >= 0 or path.find('-SKIP.') >= 0 or os.path.getsize(path) / 1048576 < 450:
 			print(name)
 		else:
 			try:
